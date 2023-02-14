@@ -68,3 +68,21 @@ Scenario: Get first 10 articles - schema validation
         } 
     """
         
+
+Scenario: Retry call
+    * configure retry = {count: 10, interval: 5000} // incearca de 10 ori cu pauza de 5s intre incercari
+    Given params {limit: 10, offset: 0}
+    Given path 'articles'
+    And retry until response.articles[0].favoritesCount == 1
+    When method GET
+    Then status 200
+    
+
+Scenario: Sleep call
+    * def sleep = function(pause){ java.lang.Thread.sleep(pause) }
+    Given params {limit: 10, offset: 0}
+    Given path 'articles'
+    When method GET
+    * eval sleep(5000)
+    Then status 200
+        
